@@ -17,7 +17,9 @@ jobs:
           python-version: "3.12"
       - run: python3 -m unittest -v
       - name: Attest tested tree for Governor
-        if: github.event_name == 'pull_request'
+        # Same-repository PRs only: fork PRs get a read-only token, and Governor must not
+        # receive attestations produced in a fork's context (missing attestation = not accepted).
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         env:
           GH_TOKEN: ${{ github.token }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
