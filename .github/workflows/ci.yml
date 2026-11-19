@@ -5,6 +5,7 @@ on:
     branches: [main]
 permissions:
   contents: read
+  statuses: write
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -14,3 +15,13 @@ jobs:
         with:
           python-version: "3.12"
       - run: python3 -m unittest -v
+      - name: Attest tested tree for Governor
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          TREE=$(git rev-parse HEAD^{tree})
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${HEAD_SHA}" \
+            -f state=success -f context=governor/tested-tree \
+            -f description="tree=${TREE} run=${GITHUB_RUN_ID}"
