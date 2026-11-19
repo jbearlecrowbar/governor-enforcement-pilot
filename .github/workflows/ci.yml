@@ -30,3 +30,4 @@ jobs:
           gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${HEAD_SHA}" \
             -f state=success -f context=governor/tested-tree \
             -f description="tree=${TREE} run=${CHECK_RUN_ID}"
+# synthetic comment added by P2.1 workflow-integrity test
